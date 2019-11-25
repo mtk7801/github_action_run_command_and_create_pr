@@ -22,7 +22,7 @@ inputs:
     description: "Commit message"
     required: true
   draft:
-    description: "Draft status of PR"
+    description: "PR draft status"
     required: true
   user:
     description: "Github user"
