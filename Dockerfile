@@ -1,9 +1,4 @@
-FROM alpine:latest
-
-RUN apk update && \
-    apk add bash curl git openssl && \
-    rm -rf /var/lib/apt/lists/* && \
-    rm /var/cache/apk/*
+FROM ubuntu:latest
 
 ADD entrypoint.sh /entrypoint.sh
 
