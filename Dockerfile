@@ -1,6 +1,7 @@
 FROM alpine:latest
 
-RUN apk --update bash curl git openssl && \
+RUN apk update && \
+    apk add bash curl git openssl && \
     rm -rf /var/lib/apt/lists/* && \
     rm /var/cache/apk/*
 
