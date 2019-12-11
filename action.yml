@@ -30,6 +30,9 @@ inputs:
   email:
     description: "User email"
     required: true
+  label:
+    description: "Label to add"
+    required: false
 
 runs:
   using: 'docker'
