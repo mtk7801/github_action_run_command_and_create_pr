@@ -21,7 +21,17 @@ git clone https://${INPUT_GH_TOKEN}@github.com/${INPUT_GROUP}/${INPUT_REPOSITORY
 cd ${INPUT_REPOSITORY}
 git config user.email "${INPUT_EMAIL}"
 git config user.name "${INPUT_USER}"
-git checkout -b ${INPUT_BRANCH}
+
+# Create a local branch. If a remote branch with the same name exists, set up the local branch to track the remote branch.
+git branch -r --contains origin/${INPUT_BRANCH} > /dev/null 2>&1
+if [[ $? -ne 0 ]]
+then
+  git checkout -b ${INPUT_BRANCH}
+else
+  git branch ${INPUT_BRANCH} origin/${INPUT_BRANCH}
+  git checkout ${INPUT_BRANCH}
+fi
+
 eval "${INPUT_COMMAND}"
 retVal=$?
 if [ $retVal -ne 0 ]; then
