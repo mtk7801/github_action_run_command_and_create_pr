@@ -14,6 +14,7 @@ echo "INPUT_COMMIT_MSG: ${INPUT_COMMIT_MSG}"
 echo "INPUT_DRAFT: ${INPUT_DRAFT}"
 echo "INPUT_USER: ${INPUT_USER}"
 echo "INPUT_EMAIL: ${INPUT_EMAIL}"
+echo "INPUT_LABEL: ${INPUT_LABEL}"
 echo "---------------------------------------------------"
 
 # Clone repository and run command
@@ -59,5 +60,24 @@ else
   DATA="{\"title\":\"${INPUT_COMMIT_MSG}\", \"body\":\"${BODY}\", \"base\":\"${TARGET}\", \"head\":\"${SOURCE}\", \"draft\":${INPUT_DRAFT}}"
 
   # Create pull request
-  curl -sSL -H "${AUTH_HEADER}" -H "${HEADER}" --user "${INPUT_USER}" -X POST --data "${DATA}" ${PULLS_URL}
+  ISSUE_NUMBER=$(curl -sSL -H "${AUTH_HEADER}" -H "${HEADER}" --user "${INPUT_USER}" -X POST --data "${DATA}" ${PULLS_URL} | jq -r '.number')
+
+  REGEX_IS_NUMBER='^[0-9]+$'
+  if ! [[ $ISSUE_NUMBER =~ $REGEX_IS_NUMBER ]] ; then
+    echo "Could not create pull request. Exiting." >&2; exit 1
+  fi
+
+  echo "Pull request #${ISSUE_NUMBER} created successfully"
+
+  if [ -z ${INPUT_LABEL+x} ]; then
+    echo "No label set. Exiting."
+  else
+    echo "Updating pull request to include label ${INPUT_LABEL}"
+
+    UPDATE_DATA="{\"labels\":[\"${INPUT_LABEL}\"]}"
+    UPDATE_PULLS_URL=${REPO_URL}/issues/${ISSUE_NUMBER}/labels
+
+    # Update PR to include a label
+    curl -sSL -H "${AUTH_HEADER}" -H "${HEADER}" --user "${INPUT_USER}" -X POST --data "${UPDATE_DATA}" ${UPDATE_PULLS_URL}
+  fi
 fi
